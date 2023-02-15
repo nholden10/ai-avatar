@@ -11,20 +11,21 @@ const Home = () => {
     setPromptText(event.target.value);
   }
 
-  async function onGenerate() {
+  async function generateAction() {
     console.log("Generating image...");
-
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "image/jpeg",
       },
-      body: JSON.stringify({ promptText }),
+      body: JSON.stringify({promptText}),
     });
+    console.log(response)
     const data = await response.json();
 
     if (response.status === 503) {
       console.log("Model is still loading...");
+      const waitTime = response.estimated_time
       return;
     }
 
@@ -64,7 +65,7 @@ const Home = () => {
               onChange={handleChange}
             />
           </div>
-          <button className="button" onClick={onGenerate}>
+          <button className="button" onClick={generateAction}>
             Generate!
           </button>
         </div>

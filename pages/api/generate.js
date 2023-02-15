@@ -1,5 +1,6 @@
 const generateAction = async function (req, res) {
   console.log("Received request.");
+  console.log(req.body)
 
   const input = JSON.parse(req.body).promptText;
 
