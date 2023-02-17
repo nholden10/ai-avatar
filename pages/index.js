@@ -14,6 +14,7 @@ const Home = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [finalPrompt, setFinalPrompt] = useState("");
   const [tooManyRequests, setTooManyRequests] = useState(false);
+  const [modelLoading, setModelLoading] = useState(false)
 
   function handleChange(event) {
     setPromptText(event.target.value);
@@ -54,6 +55,7 @@ const Home = () => {
     console.log(data.image);
 
     if (response.status === 503) {
+      setModelLoading(true)
       console.log("Model is still loading...");
       setRetry(data.estimated_time);
       return;
@@ -70,6 +72,7 @@ const Home = () => {
 
     setImg(data.image);
     setFinalPrompt(promptText);
+    setModelLoading(false)
     setIsGenerating(false);
     setTooManyRequests(false);
   }
@@ -92,6 +95,14 @@ const Home = () => {
       Generate!
     </button>
   );
+
+  let supplementaryMessage = ""
+  if (tooManyRequests) {
+    supplementaryMessage = `Easy now... the free AI model hosting service is saying enough
+    is enough for now... Come back later and try again.`
+  } else if (modelLoading) {
+    supplementaryMessage = `Model is still loading, hold your horses...`
+  }
 
   useEffect(() => {
     const runRetry = async () => {
@@ -152,14 +163,11 @@ const Home = () => {
             )}
             {generateButton}
           </div>
-          {tooManyRequests && (
-            <div className="tooManyRequests-container">
-              <h3 className="tooManyRequests-message">
-                Easy now... the free AI model hosting service is saying enough
-                is enough for now... Come back later and try again.
+            <div className="model-status-container">
+              <h3 className="model-status-message">{supplementaryMessage}
+                
               </h3>
             </div>
-          )}
           {img !== "" && (
             <div className="output-container">
               <Image
