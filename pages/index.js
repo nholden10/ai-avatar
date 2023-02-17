@@ -15,6 +15,7 @@ const Home = () => {
   const [finalPrompt, setFinalPrompt] = useState("");
   const [tooManyRequests, setTooManyRequests] = useState(false);
   const [modelLoading, setModelLoading] = useState(false)
+  const [generatingTimer, setGeneratingTimer] = useState(0)
 
   function handleChange(event) {
     setPromptText(event.target.value);
@@ -30,6 +31,8 @@ const Home = () => {
     if (isGenerating && retry == 0) return;
 
     setIsGenerating(true);
+
+    
 
     if (retry > 0) {
       setRetryCount((prevState) => {
@@ -84,26 +87,43 @@ const Home = () => {
     });
   };
 
-  const generateButton = isGenerating ? (
-    <button
-      className="button button-generate-generating"
-      onClick={generateAction}
-    >
-      Generating Image...
-    </button>
-  ) : (
-    <button className="button button-generate-idle" onClick={generateAction}>
-      Generate!
-    </button>
-  );
+  const generateButton = () => {
+    if (isGenerating) {
+
+      let generatingText = `Generating`
+      for (let dots = 0; dots < generatingTimer; dots++){
+        generatingText = generatingText + '.'
+      }
+      
+      return (<button
+        className="button button-generate-generating"
+        onClick={generateAction}
+      >
+        {generatingText}
+      </button>)
+    } else {
+      return (
+      <button className="button button-generate-idle" onClick={generateAction}>
+        Generate!
+      </button>)
+
+    }
+  }
+
+  if (isGenerating){
+
+  }
+  
 
   let supplementaryMessage = ""
+
   if (tooManyRequests) {
     supplementaryMessage = `Easy now... the free AI model hosting service is saying enough
     is enough for now... Come back later and try again.`
   } else if (modelLoading) {
     supplementaryMessage = `Model is loading, hold your horses...`
   }
+
 
   useEffect(() => {
     const runRetry = async () => {
@@ -127,6 +147,20 @@ const Home = () => {
 
     runRetry();
   }, [retry]);
+
+  useEffect(() => {
+    const id =     setInterval(() => setGeneratingTimer((prevState) => {
+      const newTime = prevState + 1 > 3 ? 0 : prevState + 1
+      return newTime
+    }), 1000)
+
+    return () => {
+      clearInterval(id)
+    }
+     }, [])
+
+
+
 
   return (
     <div className="root">
@@ -162,7 +196,7 @@ const Home = () => {
                 Clear prompt
               </button>
             )}
-            {generateButton}
+            {generateButton()}
           </div>
             <div className="model-status-container">
               <h3 className="model-status-message">{supplementaryMessage}
