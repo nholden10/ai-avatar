@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 
 const Home = () => {
   const MAX_RETRIES = 20;
+  const IMAGES = ['/lotr.jpg', '/alien.png', '/wizard.png']
 
   const [promptText, setPromptText] = useState("");
   const [img, setImg] = useState("");
@@ -86,6 +87,20 @@ const Home = () => {
       setTimeout(resolve, ms);
     });
   };
+  let fadeInTimer_s = 0;
+
+  const sampleImages = IMAGES.map((image) => {
+    fadeInTimer_s += 2
+    return (
+      <Image
+        src={image}
+        height={512 / 1.5}
+        width={512 / 1.5}
+        className={`image sample-images-${fadeInTimer_s}`}
+        alt='sampleImages'
+      ></Image>
+    )
+  })
 
   const generateButton = () => {
     if (isGenerating) {
@@ -109,11 +124,6 @@ const Home = () => {
 
     }
   }
-
-  if (isGenerating){
-
-  }
-  
 
   let supplementaryMessage = ""
 
@@ -170,6 +180,9 @@ const Home = () => {
       <div className="main-container">
         <div className="title-container">
           <h1 className="title">Welcome to the Nick avator generator.</h1>
+        </div>
+        <div className="sampleImages-container">
+          {sampleImages}
         </div>
         <div className="content-container">
           <h2 className="description">
