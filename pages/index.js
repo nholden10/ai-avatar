@@ -50,9 +50,8 @@ const Home = () => {
       },
       body: JSON.stringify({ promptText }),
     });
-    console.log(response);
+
     const data = await response.json();
-    console.log(data.image);
 
     if (response.status === 503) {
       setModelLoading(true)
@@ -76,6 +75,8 @@ const Home = () => {
     setIsGenerating(false);
     setTooManyRequests(false);
   }
+
+  
 
   const sleep = (ms) => {
     return new Promise((resolve) => {
@@ -101,7 +102,7 @@ const Home = () => {
     supplementaryMessage = `Easy now... the free AI model hosting service is saying enough
     is enough for now... Come back later and try again.`
   } else if (modelLoading) {
-    supplementaryMessage = `Model is still loading, hold your horses...`
+    supplementaryMessage = `Model is loading, hold your horses...`
   }
 
   useEffect(() => {

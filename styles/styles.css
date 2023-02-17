@@ -10,10 +10,9 @@ body {
 }
 
 .root {
-  display: flex;
   place-content: center flex-start;
   align-items: center;
-  background-color: rgb(20, 20, 20);
+  background-color: rgb(31, 31, 31);
   gap: 10px;
   height: 100vh;
   overflow: auto;
@@ -24,11 +23,8 @@ body {
 .main-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-  height: 100%;
+  padding-top: 40px;
   width: 100%;
-  overflow: auto;
   align-items: center;
   gap: 64px;
 }
@@ -47,11 +43,11 @@ body {
   flex-direction: column;
   align-items: center;
   width: 80%;
-  gap: 10px;
+  gap: 20px;
 }
 
 .description {
-  font-size: 20px;
+  font-size: 1.5rem;
   color: white;
 }
 
@@ -96,7 +92,7 @@ body {
 }
 
 .prompt-label {
-  font-size: 35px;
+  font-size: 2rem;
   color: white;
 }
 
