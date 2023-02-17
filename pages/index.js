@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 
 const Home = () => {
   const MAX_RETRIES = 20;
-  const IMAGES = ['/lotr.jpg', '/alien.png', '/wizard.png']
+  const IMAGES = ['/lotr.jpg', '/alien.png', '/Sculpture 2.png']
 
   const [promptText, setPromptText] = useState("");
   const [img, setImg] = useState("");
