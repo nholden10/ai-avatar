@@ -38,6 +38,7 @@ const Home = () => {
       method: "POST",
       headers: {
         "Content-Type": "image/jpeg",
+        'x-use-cache': 'false'
       },
       body: JSON.stringify({promptText}),
     });
