@@ -1,11 +1,17 @@
 import Head from "next/head";
 import Image from "next/image";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const Home = () => {
+  const MAX_RETRIES = 20;
+
   const [promptText, setPromptText] = useState("");
   const [img, setImg] = useState("");
+  const [retry, setRetry] = useState(0);
+  const [retryCount, setRetryCount] = useState(MAX_RETRIES)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [finalPrompt, setFinalPrompt] = useState("")
 
   function handleChange(event) {
     setPromptText(event.target.value);
@@ -13,6 +19,21 @@ const Home = () => {
 
   async function generateAction() {
     console.log("Generating image...");
+
+    if (isGenerating && retry == 0) return
+
+    setIsGenerating(true)
+
+    if (retry > 0) {
+      setRetryCount((prevState) => {
+        if (prevState === 0) {
+          return 0
+        } else {
+          return prevState-1
+        }
+      })
+      setRetry(0)
+    }
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
@@ -22,10 +43,11 @@ const Home = () => {
     });
     console.log(response)
     const data = await response.json();
+    console.log(data.image)
 
     if (response.status === 503) {
       console.log("Model is still loading...");
-      const waitTime = response.estimated_time
+      setRetry(data.estimated_time)
       return;
     }
 
@@ -35,7 +57,37 @@ const Home = () => {
     }
 
     setImg(data.image);
+    setFinalPrompt(promptText)
+    setPromptText("")
+    setIsGenerating(false)
   }
+
+  const sleep = (ms) => {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms)
+    })
+  }
+
+  useEffect(() => {
+    const runRetry = async () => {
+      if (retryCount === 0) {
+        console.log(`Model still loading after ${MAX_RETRIES} retries. Try request again in 5 minutes.`)
+        setRetryCount(MAX_RETRIES);
+        return
+      }
+      console.log(`Trying again in ${retry} seconds.`)
+
+      await sleep(retry * 1000)
+
+      await generateAction();
+    }
+
+    if (retry === 0) {
+      return
+    }
+
+    runRetry()
+  }, [retry])
 
   return (
     <div className="root">
@@ -56,7 +108,7 @@ const Home = () => {
           <div className="prompt-container">
             <label className="prompt-label">Prompt:</label>
             <input
-              placeholder="Ex) nickho, comic animation, Stan Lee, high resolution"
+              placeholder="Nickho, comic animation, Stan Lee, high resolution"
               className="input-prompt"
               type="text"
               id="prompt"
@@ -65,9 +117,27 @@ const Home = () => {
               onChange={handleChange}
             />
           </div>
-          <button className="button" onClick={generateAction}>
-            Generate!
-          </button>
+          {
+            isGenerating
+              ? <button className="button-generating" onClick={generateAction}>Generating Image...</button>
+              : <button className="button-idle" onClick={generateAction}>
+              Generate!
+            </button>
+          }
+          {
+            img && 
+            <div>
+                <Image
+                  src={img}
+                  height={512}
+                  width={512}
+                  alt={finalPrompt}
+                />
+                <h1>{finalPrompt}</h1>
+            </div>  
+          }
+
+          
         </div>
       </div>
     </div>

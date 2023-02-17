@@ -20,6 +20,7 @@ const generateAction = async function (req, res) {
 
   if (response.ok) {
     const buffer = await response.arrayBuffer();
+    console.log(buffer)
     res.status(200).json({ image: buffer });
   } else if (response.status === 503) {
     const json = await response.json();

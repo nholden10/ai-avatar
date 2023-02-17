@@ -54,11 +54,23 @@ body {
   color: white;
 }
 
-.button {
+.button-idle {
   height: 50px;
   width: 80%;
   max-width: 500px;
   background-color: rgb(107, 255, 87);
+  font-size: 2rem;
+  color: black;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+}
+
+.button-generating {
+  height: 50px;
+  width: 80%;
+  max-width: 500px;
+  background-color: rgb(255, 252, 94);
   font-size: 2rem;
   color: black;
   border: none;
