@@ -34,6 +34,7 @@ const Home = () => {
       })
       setRetry(0)
     }
+    
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
@@ -125,18 +126,20 @@ const Home = () => {
               Generate!
             </button>
           }
+
           {
             img && 
-            <div>
-                <Image
-                  src={img}
-                  height={512}
-                  width={512}
-                  alt={finalPrompt}
-                />
-                <h1>{finalPrompt}</h1>
+            <div className='output-container'>
+              <Image
+                src={img}
+                height={512}
+                width={512}
+                alt={finalPrompt}
+              />
+              <h1 className='final-prompt'>{finalPrompt}</h1>
             </div>  
           }
+
 
           
         </div>

@@ -78,14 +78,6 @@ body {
   cursor: pointer;
 }
 
-.header-subtitle h2 {
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1.4em;
-  color: rgba(255, 255, 255, 0.75);
-}
-
 .prompt-container {
   display: flex;
   justify-content: flex-start;
@@ -107,6 +99,20 @@ body {
   border-radius: 10px;
 }
 
+.final-prompt {
+  color: white;
+  text-align: center;
+
+}
+
+.output-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+/* 
 .prompt-box {
   border-bottom-width: 1px;
   border-color: rgba(255, 255, 255, 0.1);
@@ -334,6 +340,7 @@ body {
 }
 
 /* Loading ring animation */
+
 .loader {
   width: 18px;
   height: 18px;
@@ -345,7 +352,7 @@ body {
   animation: rotation 1s linear infinite;
 }
 
-@keyframes rotation {
+/* @keyframes rotation {
   0% {
     transform: rotate(0deg);
   }
@@ -354,3 +361,4 @@ body {
     transform: rotate(360deg);
   }
 }
+ */
