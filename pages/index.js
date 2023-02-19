@@ -8,88 +8,113 @@ const Home = () => {
 
   const [promptText, setPromptText] = useState("");
   const [img, setImg] = useState("");
+
   const [retry, setRetry] = useState(0);
-  const [retryCount, setRetryCount] = useState(MAX_RETRIES)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [finalPrompt, setFinalPrompt] = useState("")
+  const [retryCount, setRetryCount] = useState(MAX_RETRIES);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [finalPrompt, setFinalPrompt] = useState("");
+  const [tooManyRequests, setTooManyRequests] = useState(false);
 
   function handleChange(event) {
     setPromptText(event.target.value);
   }
 
+  function clearPrompt() {
+    setPromptText("");
+  }
+
   async function generateAction() {
     console.log("Generating image...");
 
-    if (isGenerating && retry == 0) return
+    if (isGenerating && retry == 0) return;
 
-    setIsGenerating(true)
+    setIsGenerating(true);
 
     if (retry > 0) {
       setRetryCount((prevState) => {
         if (prevState === 0) {
-          return 0
+          return 0;
         } else {
-          return prevState-1
+          return prevState - 1;
         }
-      })
-      setRetry(0)
+      });
+      setRetry(0);
     }
-    
+
     const response = await fetch("/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "image/jpeg",
-        'x-use-cache': 'false'
+        "x-use-cache": "false",
       },
-      body: JSON.stringify({promptText}),
+      body: JSON.stringify({ promptText }),
     });
-    console.log(response)
+    console.log(response);
     const data = await response.json();
-    console.log(data.image)
+    console.log(data.image);
 
     if (response.status === 503) {
       console.log("Model is still loading...");
-      setRetry(data.estimated_time)
+      setRetry(data.estimated_time);
       return;
     }
 
     if (!response.ok) {
       console.log(`Error: ${data.error}`);
+      if (response.status === 429) {
+        setTooManyRequests(true);
+        setIsGenerating(false);
+      }
       return;
     }
 
     setImg(data.image);
-    setFinalPrompt(promptText)
-    setPromptText("")
-    setIsGenerating(false)
+    setFinalPrompt(promptText);
+    setIsGenerating(false);
+    setTooManyRequests(false);
   }
 
   const sleep = (ms) => {
     return new Promise((resolve) => {
-      setTimeout(resolve, ms)
-    })
-  }
+      setTimeout(resolve, ms);
+    });
+  };
+
+  const generateButton = isGenerating ? (
+    <button
+      className="button button-generate-generating"
+      onClick={generateAction}
+    >
+      Generating Image...
+    </button>
+  ) : (
+    <button className="button button-generate-idle" onClick={generateAction}>
+      Generate!
+    </button>
+  );
 
   useEffect(() => {
     const runRetry = async () => {
       if (retryCount === 0) {
-        console.log(`Model still loading after ${MAX_RETRIES} retries. Try request again in 5 minutes.`)
+        console.log(
+          `Model still loading after ${MAX_RETRIES} retries. Try request again in 5 minutes.`
+        );
         setRetryCount(MAX_RETRIES);
-        return
+        return;
       }
-      console.log(`Trying again in ${retry} seconds.`)
+      console.log(`Trying again in ${retry} seconds.`);
 
-      await sleep(retry * 1000)
+      await sleep(retry * 1000);
 
       await generateAction();
-    }
+    };
 
     if (retry === 0) {
-      return
+      return;
     }
 
-    runRetry()
-  }, [retry])
+    runRetry();
+  }, [retry]);
 
   return (
     <div className="root">
@@ -119,29 +144,34 @@ const Home = () => {
               onChange={handleChange}
             />
           </div>
-          {
-            isGenerating
-              ? <button className="button-generating" onClick={generateAction}>Generating Image...</button>
-              : <button className="button-idle" onClick={generateAction}>
-              Generate!
-            </button>
-          }
-
-          {
-            img && 
-            <div className='output-container'>
+          <div className="button-container">
+            {promptText && (
+              <button className="button button-clear" onClick={clearPrompt}>
+                Clear prompt
+              </button>
+            )}
+            {generateButton}
+          </div>
+          {tooManyRequests && (
+            <div className="tooManyRequests-container">
+              <h3 className="tooManyRequests-message">
+                Easy now... the free AI model hosting service is saying enough
+                is enough for now... Come back later and try again.
+              </h3>
+            </div>
+          )}
+          {img !== "" && (
+            <div className="output-container">
               <Image
                 src={img}
                 height={512}
                 width={512}
                 alt={finalPrompt}
+                className="image"
               />
-              <h1 className='final-prompt'>{finalPrompt}</h1>
-            </div>  
-          }
-
-
-          
+              <h1 className="final-prompt">{finalPrompt}</h1>
+            </div>
+          )}
         </div>
       </div>
     </div>
